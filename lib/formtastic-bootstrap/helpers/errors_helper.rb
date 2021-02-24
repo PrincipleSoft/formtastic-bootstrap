@@ -5,7 +5,7 @@ module FormtasticBootstrap
       include Formtastic::Helpers::Reflection
       include Formtastic::LocalizedString
 
-      INLINE_ERROR_TYPES = [:sentence, :list, :first]
+      INLINE_ERROR_TYPES = %i[sentence list first].freeze
 
       # Generates a bootstrap error alert element containing
       # an unordered list of error messages on the base object and optionally for a given
@@ -41,28 +41,28 @@ module FormtasticBootstrap
       #   <% end %>
       def semantic_errors(*args)
         html_options = args.extract_options!
-        args = args - [:base]
+        args -= [:base]
         full_errors = args.inject([]) do |array, method|
           attribute = localized_string(method, method.to_sym, :label) || humanized_attribute_name(method)
           errors = Array(@object.errors[method.to_sym]).to_sentence
-          errors.present? ? array << [attribute, errors].join(" ") : array ||= []
+          errors.present? ? array << [attribute, errors].join(' ') : array ||= []
         end
         full_errors << @object.errors[:base]
         full_errors.flatten!
         full_errors.compact!
         return nil if full_errors.blank?
 
-        if html_options[:class].blank?
-          html_options[:class] = "alert alert-danger"
-        else
-          html_options[:class] = "alert alert-danger " + html_options[:class]
-        end
+        html_options[:class] = if html_options[:class].blank?
+                                 'alert alert-danger'
+                               else
+                                 'alert alert-danger ' + html_options[:class]
+                               end
 
         template.content_tag(:div, html_options) do
-          template.content_tag(:a, "&times;".html_safe, :class => "close", "data-dismiss" => "alert") +
-          template.content_tag(:ul, {:class => "error-list"}) do
-            Formtastic::Util.html_safe(full_errors.map { |error| template.content_tag(:li, Formtastic::Util.html_safe(error)) }.join)
-          end
+          template.content_tag(:a, '&times;'.html_safe, :class => 'close', 'data-dismiss' => 'alert') +
+            template.content_tag(:ul, { class: 'error-list' }) do
+              full_errors.map { |error| template.content_tag(:li, error.html_safe) }.join.html_safe
+            end
         end
       end
     end
