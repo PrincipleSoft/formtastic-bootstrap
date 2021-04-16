@@ -14,7 +14,7 @@ module FormtasticBootstrap
                         else
                           options[:error_class] || builder.default_block_error_class
                         end
-          template.content_tag(:span, Formtastic::Util.html_safe(errors.to_sentence.html_safe), class: error_class)
+          template.content_tag(:span, errors.to_sentence.html_safe, class: error_class)
         end
 
         def error_list_html(_ignore)
